@@ -1,0 +1,24 @@
+In this quick report, I explain what I did in order to build and compile the latest kernel and install it on my personal computer
+--------------------------------------------------
+
+
+Setup : 
+	I use an x86_64 machine running Ubuntu 18.4.5 LTS, my current kernel version is 5.4.54.
+
+
+step 1 : 
+	Download the latest stable kernel sources from kernel.org, and unzip the compressed files.
+
+step 2 : 
+	Copy the current kernel configuration to the .config file in the source code that you downloaded. This is important to save time and be sure that the configuration is right for your machine.
+After that, you can run "make menuconfig" and upload the configuration file to the source.
+
+step 3 :
+	After configuring properly the kernel, it's time to run "make -jX" to build and compile the kernel. 
+
+step 4 :
+	Install the modules and then the kernel.
+step 5 :
+	Reboot the system and check the kernel version "uname -a" and make sure that it's the same version of the source kernel that you downloaded earlier. In my case, I found "5.9.9".
+
+Congrats now you are using the new kernel that you built and compiled by yourself !!!
