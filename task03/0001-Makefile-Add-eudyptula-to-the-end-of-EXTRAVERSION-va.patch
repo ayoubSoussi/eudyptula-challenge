@@ -1,0 +1,27 @@
+From 7bbd611d7e1edcc29bd921e0e887e634f89a47c6 Mon Sep 17 00:00:00 2001
+From: ayoubSoussi <ayoubfme@gmail.com>
+Date: Sun, 22 Nov 2020 02:39:44 +0100
+Subject: [PATCH] Makefile: Add "-eudyptula" to the end of EXTRAVERSION
+ variable
+
+Signed-off-by: Ayoub SOUSSI <ayoubfme@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index e2c3f65c4721..0c08593d6879 100644
+--- a/Makefile
++++ b/Makefile
+@@ -2,7 +2,7 @@
+ VERSION = 5
+ PATCHLEVEL = 10
+ SUBLEVEL = 0
+-EXTRAVERSION = -rc4
++EXTRAVERSION = -rc4-eudyptula
+ NAME = Kleptomaniac Octopus
+ 
+ # *DOCUMENTATION*
+-- 
+2.17.1
+
