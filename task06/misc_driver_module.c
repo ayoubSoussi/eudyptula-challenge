@@ -1,5 +1,6 @@
-// Licence: GPL-2.0
 /*
+ * Licence: GPLv2
+ *
  * hello_module.c
  */
 #include <linux/init.h>
@@ -28,7 +29,7 @@ static ssize_t misc_read(struct file *filp, char __user *buf, size_t count,
 
 	if (copy_to_user(buf, id, sizeof(id))) {
 		retval = -EFAULT;
-		pr_alert("[MISC MODULE]Error in copy_to_user function !\n");	
+		pr_alert("[MISC MODULE]Error in copy_to_user function !\n");
 		goto out;
 	}
 
@@ -41,7 +42,7 @@ out:
 }
 
 static ssize_t misc_write(struct file *filp, const char __user *buf,
-	       	size_t count, loff_t *f_pos)
+		size_t count, loff_t *f_pos)
 {
 	char *id = kcalloc(sizeof(buf), sizeof(char), GFP_KERNEL);
 	ssize_t retval = 0;
@@ -50,13 +51,13 @@ static ssize_t misc_write(struct file *filp, const char __user *buf,
 	if (copy_from_user(id, buf, sizeof(DEV_ID))) {
 		pr_alert("[MISC MODULE] Error in copy_from_user function !\n");
 		retval = -EFAULT;
-		goto out;	
+		goto out;
 	}
-	pr_alert("[MISC MODULE] %s, %s \n", DEV_ID, id);
+	pr_alert("[MISC MODULE] %s, %s\n", DEV_ID, id);
 	if (strncmp(DEV_ID, id, strlen(DEV_ID))) {
 		pr_alert("[MISC MODULE] ID IS NOT CORRECT !\n");
 		retval = -EINVAL;
-	       	goto out;
+		goto out;
 	}
 
 	pr_alert("[MISC MODULE] Coongrats ! ID IS CORRECT!!\n");
