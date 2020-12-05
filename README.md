@@ -12,7 +12,8 @@ My answers to the Eudyptula Challenge
 - [Task 04](https://github.com/ayoubSoussi/eudyptula-challenge/blob/main/task04/task04_mission.txt)
 - [Task 05](https://github.com/ayoubSoussi/eudyptula-challenge/blob/main/task05/task05_mission.txt)
 - [Task 06](https://github.com/ayoubSoussi/eudyptula-challenge/blob/main/task06/task06_mission.txt)
-- Task 07 - Task 20 : Coming Soon
+- [Task 07](https://github.com/ayoubSoussi/eudyptula-challenge/blob/main/task07/task07_mission.txt)
+- Task 08 - Task 20 : Coming Soon
 
 ### Sources
 - [http://eudyptula-challenge.org/](http://eudyptula-challenge.org/)
