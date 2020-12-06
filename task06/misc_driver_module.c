@@ -63,6 +63,7 @@ static ssize_t misc_write(struct file *filp, const char __user *buf,
 	pr_alert("[MISC MODULE] Coongrats ! ID IS CORRECT!!\n");
 
 out:
+	kfree(id);
 	return retval;
 }
 
