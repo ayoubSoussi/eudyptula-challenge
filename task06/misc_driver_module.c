@@ -76,7 +76,7 @@ static struct miscdevice misc_dev = {
 	.minor = MISC_DYNAMIC_MINOR,
 	.name = "misc_name",
 	.fops = &misc_fops,
-	.nodename = "misc_node_name",
+	.nodename = "eudyptula",
 };
 
 static int __init misc_init(void)
