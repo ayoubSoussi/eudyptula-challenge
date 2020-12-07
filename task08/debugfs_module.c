@@ -15,8 +15,8 @@
 #include <linux/slab.h>
 #include <linux/string.h>
 #include <linux/stat.h>
+#include <linux/jiffies.h>
 
-#define DEVEUDYID "EudyID!"
 
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Simple debugfs module");
@@ -26,51 +26,25 @@ static ssize_t debugfs_read(struct file *filp, char __user *buf, size_t count,
 		loff_t *f_pos)
 {
 	ssize_t retval = 0;
-	char *id = DEVEUDYID;
+	char jiffies_str[20];
+	
+	snprintf(jiffies_str, sizeof jiffies_str, "%llu", get_jiffies_64());
 
-	if (copy_to_user(buf, id, sizeof(id))) {
+	if (copy_to_user(buf, jiffies_str, sizeof jiffies_str)) {
 		retval = -EFAULT;
 		pr_alert("[DEBUGFS MODULE]Error in copy_to_user function !\n");
 		goto out;
 	}
 
-	(*f_pos) += sizeof(id);
-	retval += sizeof(id);
+	(*f_pos) += sizeof jiffies_str;
+	retval += sizeof jiffies_str;
 out:
-	pr_alert("[DEBUG MODULE]Read operation succeeded !\n");
-	return retval;
-
-}
-
-static ssize_t debugfs_write(struct file *filp, const char __user *buf,
-		size_t count, loff_t *f_pos)
-{
-	char *id = kcalloc(sizeof(buf), sizeof(char), GFP_KERNEL);
-	ssize_t retval = 0;
-	const char *DEV_ID = DEVEUDYID;
-
-	if (copy_from_user(id, buf, sizeof(DEV_ID))) {
-		pr_alert("[DEBUGFS MODULE] Error in copy_from_user function !\n");
-		retval = -EFAULT;
-		goto out;
-	}
-	pr_alert("[DEBUGFS MODULE] %s, %s\n", DEV_ID, id);
-	if (strncmp(DEV_ID, id, strlen(DEV_ID))) {
-		pr_alert("[DEBUGFS MODULE] ID IS NOT CORRECT !\n");
-		retval = -EINVAL;
-		goto out;
-	}
-
-	pr_alert("[DEBUGFS MODULE] Coongrats ! ID IS CORRECT!!\n");
-
-out:
-	kfree(id);
+	pr_alert("[DEBUGFS MODULE]Read operation succeeded !\n");
 	return retval;
 }
 
 static const struct file_operations debugfs_fops = {
 	.read = debugfs_read,
-	.write = debugfs_write,
 };
 
 static struct dentry *dir_parent;
@@ -79,7 +53,7 @@ static int __init dfs_init(void)
 {
 	pr_alert("[DEBUGFS_MODULE] Module loaded !\n");
 	dir_parent = debugfs_create_dir("eudyptula", NULL);
-	debugfs_create_file("id", S_IRUGO | S_IWUGO, dir_parent, NULL,
+	debugfs_create_file("jiffies", S_IRUGO, dir_parent, NULL,
 		       	&debugfs_fops);
 
 	return 0;
