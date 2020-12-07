@@ -27,17 +27,16 @@ static ssize_t debugfs_read(struct file *filp, char __user *buf, size_t count,
 {
 	ssize_t retval = 0;
 	char jiffies_str[20];
-	
-	snprintf(jiffies_str, sizeof jiffies_str, "%llu", get_jiffies_64());
+	snprintf(jiffies_str, sizeof(jiffies_str), "%llu", get_jiffies_64());
 
-	if (copy_to_user(buf, jiffies_str, sizeof jiffies_str)) {
+	if (copy_to_user(buf, jiffies_str, sizeof(jiffies_str))) {
 		retval = -EFAULT;
 		pr_alert("[DEBUGFS MODULE]Error in copy_to_user function !\n");
 		goto out;
 	}
 
-	(*f_pos) += sizeof jiffies_str;
-	retval += sizeof jiffies_str;
+	(*f_pos) += sizeof(jiffies_str);
+	retval += sizeof(jiffies_str);
 out:
 	pr_alert("[DEBUGFS MODULE]Read operation succeeded !\n");
 	return retval;
@@ -54,8 +53,7 @@ static int __init dfs_init(void)
 	pr_alert("[DEBUGFS_MODULE] Module loaded !\n");
 	dir_parent = debugfs_create_dir("eudyptula", NULL);
 	debugfs_create_file("jiffies", S_IRUGO, dir_parent, NULL,
-		       	&debugfs_fops);
-
+	&debugfs_fops);
 	return 0;
 }
 
