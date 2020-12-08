@@ -1,0 +1,93 @@
+From 0afc9f6b42e2123a70e6f5450e76f1303a58da56 Mon Sep 17 00:00:00 2001
+From: ayoubSoussi <ayoubfme@gmail.com>
+Date: Tue, 8 Dec 2020 11:53:00 +0100
+Subject: [PATCH] create and test foo file in debugfs
+
+Signed-off-by: Ayoub Soussi <ayoubfme@gmail.com>
+---
+ task08/debugfs_module.c | 39 ++++++++++++++++++++++++++++++++-------
+ 1 file changed, 32 insertions(+), 7 deletions(-)
+
+diff --git a/task08/debugfs_module.c b/task08/debugfs_module.c
+index 6f61451..eb90f4d 100644
+--- a/task08/debugfs_module.c
++++ b/task08/debugfs_module.c
+@@ -15,35 +15,60 @@
+ #include <linux/slab.h>
+ #include <linux/string.h>
+ #include <linux/stat.h>
+-#include <linux/jiffies.h>
++#include <linux/rwlock.h>
+ 
+ 
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Simple debugfs module");
+ MODULE_AUTHOR("Ayoub SOUSSI");
+ 
++static char mem_page[PAGE_SIZE];
++static rwlock_t memlock = __RW_LOCK_UNLOCKED(memlock);
++
+ static ssize_t debugfs_read(struct file *filp, char __user *buf, size_t count,
+ 		loff_t *f_pos)
+ {
+ 	ssize_t retval = 0;
+-	char jiffies_str[20];
+-	snprintf(jiffies_str, sizeof(jiffies_str), "%llu", get_jiffies_64());
++	unsigned long flags;
+ 
+-	if (copy_to_user(buf, jiffies_str, sizeof(jiffies_str))) {
++	read_lock_irqsave(&memlock, flags);
++	if (copy_to_user(buf, mem_page, sizeof(mem_page))) {
+ 		retval = -EFAULT;
+ 		pr_alert("[DEBUGFS MODULE]Error in copy_to_user function !\n");
+ 		goto out;
+ 	}
+ 
+-	(*f_pos) += sizeof(jiffies_str);
+-	retval += sizeof(jiffies_str);
++	(*f_pos) += sizeof(mem_page);
++	retval += sizeof(mem_page);
+ out:
++	read_unlock_irqrestore(&memlock, flags);
+ 	pr_alert("[DEBUGFS MODULE]Read operation succeeded !\n");
+ 	return retval;
+ }
+ 
++static ssize_t debugfs_write(struct file *filp, const char __user *buf,
++		size_t count, loff_t *f_pos)
++{
++	ssize_t retval = 0;
++	unsigned long flags;
++
++	write_lock_irqsave(&memlock, flags);
++	if (copy_from_user(mem_page, buf, sizeof(buf))) {
++		pr_alert("[DEBUGFS MODULE] Error in copy_from_user function !\n");
++		retval = -EFAULT;
++		goto out;
++	}
++
++	pr_alert("[DEBUGFS MODULE] Write operation succeeded !!\n");
++
++out:
++	write_unlock_irqrestore(&memlock, flags);
++	return retval;
++}
++
+ static const struct file_operations debugfs_fops = {
+ 	.read = debugfs_read,
++	.write = debugfs_write,
+ };
+ 
+ static struct dentry *dir_parent;
+@@ -52,7 +77,7 @@ static int __init dfs_init(void)
+ {
+ 	pr_alert("[DEBUGFS_MODULE] Module loaded !\n");
+ 	dir_parent = debugfs_create_dir("eudyptula", NULL);
+-	debugfs_create_file("jiffies", S_IRUGO, dir_parent, NULL,
++	debugfs_create_file("foo", S_IWUSR | S_IRUGO, dir_parent, NULL,
+ 	&debugfs_fops);
+ 	return 0;
+ }
+-- 
+2.17.1
+
