@@ -1,0 +1,27 @@
+From 47652fcf61df2cba9695ce0c597009b44fe838e8 Mon Sep 17 00:00:00 2001
+From: Ayoub Soussi <ayoubfme@gmail.com>
+Date: Wed, 23 Dec 2020 21:08:03 +0100
+Subject: [PATCH] staging: ralink-gdma: Fixed blank line coding style issue
+
+Fixed coding style issue.
+
+Signed-off-by: Ayoub Soussi <ayoubfme@gmail.com>
+---
+ drivers/staging/ralink-gdma/ralink-gdma.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/staging/ralink-gdma/ralink-gdma.c b/drivers/staging/ralink-gdma/ralink-gdma.c
+index 655df317d0ee..a6181a167814 100644
+--- a/drivers/staging/ralink-gdma/ralink-gdma.c
++++ b/drivers/staging/ralink-gdma/ralink-gdma.c
+@@ -122,6 +122,7 @@ struct gdma_dma_dev {
+ 	struct gdma_data *data;
+ 	void __iomem *base;
+ 	struct tasklet_struct task;
++
+ 	volatile unsigned long chan_issued;
+ 	atomic_t cnt;
+ 
+-- 
+2.17.1
+
