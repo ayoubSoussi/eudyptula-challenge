@@ -1,0 +1,125 @@
+From 430ad4c9d3b62f78732fde2cea78624ca6d9a860 Mon Sep 17 00:00:00 2001
+From: Ayoub Soussi <ayoubfme@gmail.com>
+Date: Fri, 8 Jan 2021 22:24:21 +0100
+Subject: [PATCH] drivers: wireless: iwl-drv: Add sysfs file in the devices
+ directory
+
+Add sysfs file in the devices directory
+
+Signed-off-by: Ayoub Soussi <ayoubfme@gmail.com>
+---
+ drivers/net/wireless/intel/iwlwifi/iwl-drv.c | 74 ++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
+
+diff --git a/drivers/net/wireless/intel/iwlwifi/iwl-drv.c b/drivers/net/wireless/intel/iwlwifi/iwl-drv.c
+index 04f14bfdd..498e130e7 100644
+--- a/drivers/net/wireless/intel/iwlwifi/iwl-drv.c
++++ b/drivers/net/wireless/intel/iwlwifi/iwl-drv.c
+@@ -65,6 +65,20 @@
+ #include <linux/module.h>
+ #include <linux/vmalloc.h>
+ 
++#include <linux/init.h>
++#include <linux/fs.h>
++#include <linux/uaccess.h>
++#include <linux/errno.h>
++#include <linux/types.h>
++#include <linux/sysfs.h>
++#include <linux/kernel.h>
++#include <linux/gfp.h>
++#include <linux/slab.h>
++#include <linux/string.h>
++#include <linux/stat.h>
++#include <linux/rwlock.h>
++#include <linux/kobject.h>
++
+ #include "iwl-drv.h"
+ #include "iwl-csr.h"
+ #include "iwl-debug.h"
+@@ -1764,9 +1778,52 @@ void iwl_opmode_deregister(const char *name)
+ }
+ IWL_EXPORT_SYMBOL(iwl_opmode_deregister);
+ 
++/* Add sysfs id file */
++
++static char mem_page[PAGE_SIZE];
++static rwlock_t memlock = __RW_LOCK_UNLOCKED(memlock);
++
++static ssize_t id_show(struct kobject *kobj, struct kobj_attribute *attr,
++                char *buf)
++{
++        ssize_t retval = 0;
++        unsigned long flags;
++
++        read_lock_irqsave(&memlock, flags);
++
++        strncpy(buf, mem_page, sizeof(mem_page));
++        retval += sizeof(mem_page);
++
++        read_unlock_irqrestore(&memlock, flags);
++
++        pr_alert("[SYSFS IN IWLWIFI] Read operation succedded !\n");
++
++        return retval;
++}
++
++static ssize_t id_store(struct kobject *kobj, struct kobj_attribute *attr,
++                const char *buf, size_t count)
++{
++        ssize_t retval = 0;
++        unsigned long flags;
++
++        write_lock_irqsave(&memlock, flags);
++
++        strncpy(mem_page, buf, count);
++
++        pr_alert("[SYSFS IN IWLWIFI] Write operation succedded !");
++
++        write_unlock_irqrestore(&memlock, flags);
++        return retval < 0 ? retval : count;
++}
++
++struct kobject *task_kobj;
++static struct kobj_attribute id_attr = __ATTR_RW(id);
++
+ static int __init iwl_drv_init(void)
+ {
+ 	int i, err;
++	int rc = 0;
+ 
+ 	mutex_init(&iwlwifi_opmode_table_mtx);
+ 
+@@ -1775,6 +1832,17 @@ static int __init iwl_drv_init(void)
+ 
+ 	pr_info(DRV_DESCRIPTION "\n");
+ 
++	/* create sysfs id file */
++        task_kobj = kobject_create_and_add("devices", kernel_kobj);
++        if (!task_kobj)
++                pr_err("[SYSFS IN IWLWIFI] failed to create task_kobj\n");
++
++        pr_alert("[SYSFS IN IWLWIFI] kobj created successfully\n");
++
++        rc = sysfs_create_file(task_kobj, &id_attr.attr);
++        if (rc)
++                pr_err("[SYSFS IN IWLWIFI] unable to create file id\n");
++
+ #ifdef CONFIG_IWLWIFI_DEBUGFS
+ 	/* Create the root of iwlwifi debugfs subsystem. */
+ 	iwl_dbgfs_root = debugfs_create_dir(DRV_NAME, NULL);
+@@ -1796,6 +1864,12 @@ module_init(iwl_drv_init);
+ 
+ static void __exit iwl_drv_exit(void)
+ {
++	sysfs_remove_file(task_kobj, &id_attr.attr);
++
++        kobject_del(task_kobj);
++
++        pr_alert("[SYSFS IN IWLWIFI] id file removed !\n");
++
+ 	iwl_pci_unregister_driver();
+ 
+ #ifdef CONFIG_IWLWIFI_DEBUGFS
+-- 
+2.17.1
+
