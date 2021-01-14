@@ -1,0 +1,75 @@
+From 54358356bc9c5ef3a852f931c60ee488464c5d05 Mon Sep 17 00:00:00 2001
+From: Ayoub Soussi <ayoubfme@gmail.com>
+Date: Thu, 14 Jan 2021 19:27:07 +0100
+Subject: [PATCH] Add task_struct attribute and proc file
+
+---
+ fs/proc/base.c        | 13 +++++++++++++
+ include/linux/sched.h |  4 +++-
+ kernel/fork.c         |  4 ++++
+ 3 files changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/fs/proc/base.c b/fs/proc/base.c
+index aa69c35d9..fb433f39f 100644
+--- a/fs/proc/base.c
++++ b/fs/proc/base.c
+@@ -2743,6 +2743,18 @@ static ssize_t proc_pid_attr_write(struct file * file, const char __user * buf,
+ out:
+ 	return rv;
+ }
++/*
++ * Eudyptula : Add show function
++ */
++static int proc_show_id(struct seq_file *m,
++		struct pid_namespace *ns, struct pid *pid,
++		struct task_struct *task)
++{
++	seq_printf(m, "%d\n", task->id);
++	task->id++;
++
++	return 0;
++}
+ 
+ static const struct file_operations proc_pid_attr_operations = {
+ 	.read		= proc_pid_attr_read,
+@@ -2802,6 +2814,7 @@ static const struct pid_entry attr_dir_stuff[] = {
+ 	ATTR(NULL, "fscreate",		0666),
+ 	ATTR(NULL, "keycreate",		0666),
+ 	ATTR(NULL, "sockcreate",	0666),
++	ONE("id", S_IRUGO, proc_show_id),
+ #ifdef CONFIG_SECURITY_SMACK
+ 	DIR("smack",			0555,
+ 	    proc_smack_attr_dir_inode_ops, proc_smack_attr_dir_ops),
+diff --git a/include/linux/sched.h b/include/linux/sched.h
+index 8bf2295eb..0b440a88a 100644
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -1328,7 +1328,9 @@ struct task_struct {
+ 
+ 	/* CPU-specific state of this task: */
+ 	struct thread_struct		thread;
+-
++	
++	/* Eudyptula challenge : id */
++	int id;
+ 	/*
+ 	 * WARNING: on x86, 'thread_struct' contains a variable-sized
+ 	 * structure.  It *MUST* be at the end of 'task_struct'.
+diff --git a/kernel/fork.c b/kernel/fork.c
+index 5fe09d4e6..fafa248f5 100644
+--- a/kernel/fork.c
++++ b/kernel/fork.c
+@@ -2489,6 +2489,10 @@ long _do_fork(struct kernel_clone_args *args)
+ 	}
+ 
+ 	put_pid(pid);
++
++	/* Initialize id */
++	p->id = 0x12345678;
++
+ 	return nr;
+ }
+ 
+-- 
+2.17.1
+
