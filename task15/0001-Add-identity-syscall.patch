@@ -1,0 +1,73 @@
+From a9cb3cf2a8777287c7e83572a65bc8c18ddfb2fe Mon Sep 17 00:00:00 2001
+From: Ayoub Soussi <ayoubfme@gmail.com>
+Date: Sat, 16 Jan 2021 01:12:37 +0100
+Subject: [PATCH] Add identity syscall
+
+---
+ Makefile                               |  2 +-
+ arch/x86/entry/syscalls/syscall_64.tbl |  1 +
+ identity/Makefile                      |  1 +
+ identity/identity.c                    | 21 +++++++++++++++++++++
+ 4 files changed, 24 insertions(+), 1 deletion(-)
+ create mode 100644 identity/Makefile
+ create mode 100644 identity/identity.c
+
+diff --git a/Makefile b/Makefile
+index d4d36c619..c1f739620 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1013,7 +1013,7 @@ PHONY += prepare0
+ export MODORDER := $(extmod-prefix)modules.order
+ 
+ ifeq ($(KBUILD_EXTMOD),)
+-core-y		+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/
++core-y		+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/ identity/
+ 
+ vmlinux-dirs	:= $(patsubst %/,%,$(filter %/, $(init-y) $(init-m) \
+ 		     $(core-y) $(core-m) $(drivers-y) $(drivers-m) \
+diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
+index c29976eca..e66008079 100644
+--- a/arch/x86/entry/syscalls/syscall_64.tbl
++++ b/arch/x86/entry/syscalls/syscall_64.tbl
+@@ -400,3 +400,4 @@
+ 545	x32	execveat		__x32_compat_sys_execveat/ptregs
+ 546	x32	preadv2			__x32_compat_sys_preadv64v2
+ 547	x32	pwritev2		__x32_compat_sys_pwritev64v2
++548	64	identity		__x64_sys_identity
+diff --git a/identity/Makefile b/identity/Makefile
+new file mode 100644
+index 000000000..b529f1f87
+--- /dev/null
++++ b/identity/Makefile
+@@ -0,0 +1 @@
++obj-y := identity.o
+diff --git a/identity/identity.c b/identity/identity.c
+new file mode 100644
+index 000000000..2eea3e8e8
+--- /dev/null
++++ b/identity/identity.c
+@@ -0,0 +1,21 @@
++#include <linux/kernel.h>
++#include <linux/syscalls.h>
++#include <linux/printk.h>
++#include <linux/errno.h>
++
++#define PERSONAL_ID 0x1234567890123456
++
++SYSCALL_DEFINE2(identity, int, high_id, int, low_id)
++{
++	unsigned long input_id = (((unsigned long) high_id) << 32) 
++		| ((unsigned long) low_id);
++
++	pr_alert("[SYSCALL] High id is : %x, low_id is : %x\n",
++			high_id, low_id);
++	pr_alert("[SYSCALL] Entered id is : %lx\n", input_id);
++
++	if (input_id != PERSONAL_ID)
++		return -EINVAL;
++
++	return 0;
++}
+-- 
+2.17.1
+
