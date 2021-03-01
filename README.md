@@ -16,7 +16,13 @@ My answers to the Eudyptula Challenge
 - [Task 08](https://github.com/ayoubSoussi/eudyptula-challenge/blob/main/task08/task08_mission.txt)
 - [Task 09](https://github.com/ayoubSoussi/eudyptula-challenge/blob/main/task09/task09_mission.txt)
 - [Task 10](https://github.com/ayoubSoussi/eudyptula-challenge/blob/main/task10/task10_mission.txt)
-- Task 11 - Task 20 : Coming Soon
+- [Task 11](https://github.com/ayoubSoussi/eudyptula-challenge/blob/main/task11/task11_mission.txt)
+- [Task 12](https://github.com/ayoubSoussi/eudyptula-challenge/blob/main/task12/task12_mission.txt)
+- [Task 13](https://github.com/ayoubSoussi/eudyptula-challenge/blob/main/task13/task13_mission.txt)
+- [Task 14](https://github.com/ayoubSoussi/eudyptula-challenge/blob/main/task14/task14_mission.txt)
+- [Task 15](https://github.com/ayoubSoussi/eudyptula-challenge/blob/main/task15/task15_mission.txt)
+- [Task 16](https://github.com/ayoubSoussi/eudyptula-challenge/blob/main/task16/task16_mission.txt)
+- Task 17 - Task 20 : Coming Soon
 
 ### Sources
 - [http://eudyptula-challenge.org/](http://eudyptula-challenge.org/)
